@@ -3,12 +3,16 @@ from zope.interface import implementer
 from pyramid.interfaces import (
     IAuthorizationPolicy,
     IAuthenticationPolicy,
+    ICSRF,
     IDefaultCSRFOptions,
     IDefaultPermission,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
     )
 
+from pyramid.csrf import SessionCSRF
+
+from pyramid.config.util import as_sorted_tuple
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
 from pyramid.util import as_sorted_tuple
@@ -165,6 +169,7 @@ class SecurityConfiguratorMixin(object):
     @action_method
     def set_default_csrf_options(
         self,
+        implementation=SessionCSRF,
         require_csrf=True,
         token='csrf_token',
         header='X-CSRF-Token',
@@ -208,6 +213,7 @@ class SecurityConfiguratorMixin(object):
             require_csrf, token, header, safe_methods, callback,
         )
         def register():
+            self.registry.registerUtility(implementation(), ICSRF)
             self.registry.registerUtility(options, IDefaultCSRFOptions)
         intr = self.introspectable('default csrf view options',
                                    None,
