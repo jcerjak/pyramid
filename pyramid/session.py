@@ -23,7 +23,7 @@ from pyramid.exceptions import (
     BadCSRFOrigin,
     BadCSRFToken,
 )
-from pyramid.interfaces import ISession
+from pyramid.interfaces import ISession, ICSRF
 from pyramid.settings import aslist
 from pyramid.util import (
     is_same_domain,
@@ -246,7 +246,8 @@ def check_csrf_token(request,
     if supplied_token == "" and header is not None:
         supplied_token = request.headers.get(header, "")
 
-    expected_token = request.session.get_csrf_token()
+    impl = request.registry.getUtility(ICSRF)
+    expected_token = impl.get_csrf_token(request)
     if strings_differ(bytes_(expected_token), bytes_(supplied_token)):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')

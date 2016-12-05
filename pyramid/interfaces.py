@@ -992,18 +992,23 @@ class ISession(IDict):
         :meth:`pyramid.interfaces.ISession.flash`
         """
 
+
+class ICSRF(Interface):
+    """ An object that offers the ability to verify CSRF tokens and generate
+    new ones"""
+
     def new_csrf_token():
-        """ Create and set into the session a new, random cross-site request
-        forgery protection token.  Return the token.  It will be a string."""
+        """ Create and return a new, random cross-site request forgery 
+        protection token.  Return the token.  It will be a string."""
 
     def get_csrf_token():
-        """ Return a random cross-site request forgery protection token.  It
-        will be a string.  If a token was previously added to the session via
+        """ Return a cross-site request forgery protection token.  It
+        will be a string.  If a token was previously set for this user via
         ``new_csrf_token``, that token will be returned.  If no CSRF token
-        was previously set into the session, ``new_csrf_token`` will be
-        called, which will create and set a token, and this token will be
-        returned.
+        was previously set, ``new_csrf_token`` will be called, which will 
+        create and set a token, and this token will be returned.
         """
+
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):
