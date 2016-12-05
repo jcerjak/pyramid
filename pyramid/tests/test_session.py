@@ -660,6 +660,10 @@ class Test_signed_deserialize(unittest.TestCase):
         self.assertEqual(result, '123')
 
 class Test_check_csrf_token(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.set_default_csrf_options(require_csrf=False)
+
     def _callFUT(self, *args, **kwargs):
         from ..session import check_csrf_token
         return check_csrf_token(*args, **kwargs)
