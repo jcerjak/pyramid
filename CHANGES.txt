@@ -119,6 +119,14 @@ Features
 
   See https://github.com/Pylons/pyramid/pull/2805
 
+- A new CSRF implementation, :class:`pyramid.csrf.SessionCSRF` has been added,
+  which deleagates all CSRF generation to the current session, following the
+  old API for this. A ``get_csrf_token()`` method is now available in template
+  global scope, to make it easy for template developers to get the current CSRF
+  token without adding it to Python code.
+  See https://github.com/Pylons/pyramid/pull/2854
+
+
 Bug Fixes
 ---------
 
@@ -171,3 +179,7 @@ Documentation Changes
   :class:`pyramid.httpexceptions.HTTPException` in which more appropriate
   kwargs from the parent class :class:`pyramid.response.Response` should be
   used instead. See https://github.com/Pylons/pyramid/pull/2750
+
+- Retrieving CSRF token from the session has been deprecated, in favor of
+  equivalent methods in :mod:`pyramid.csrf`.
+  See https://github.com/Pylons/pyramid/pull/2854
