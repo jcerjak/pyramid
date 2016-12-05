@@ -23,6 +23,8 @@ from pyramid.decorator import reify
 
 from pyramid.events import BeforeRender
 
+from pyramid.interfaces import ICSRF
+
 from pyramid.httpexceptions import HTTPBadRequest
 
 from pyramid.path import caller_package
@@ -429,6 +431,13 @@ class RendererHelper(object):
                   'request':request,
                   'req':request,
                   }
+        try:
+            registry = request.registry
+            csrf = registry.queryUtility(ICSRF)
+            if csrf is not None:
+                system['csrf_token'] = csrf.get_csrf_token(request)
+        except AttributeError:
+            pass
         return self.render_to_response(response, system, request=request)
 
     def render(self, value, system_values, request=None):

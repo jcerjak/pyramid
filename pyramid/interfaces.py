@@ -997,11 +997,11 @@ class ICSRF(Interface):
     """ An object that offers the ability to verify CSRF tokens and generate
     new ones"""
 
-    def new_csrf_token():
+    def new_csrf_token(request):
         """ Create and return a new, random cross-site request forgery 
         protection token.  Return the token.  It will be a string."""
 
-    def get_csrf_token():
+    def get_csrf_token(request):
         """ Return a cross-site request forgery protection token.  It
         will be a string.  If a token was previously set for this user via
         ``new_csrf_token``, that token will be returned.  If no CSRF token
