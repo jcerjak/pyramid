@@ -431,13 +431,6 @@ class RendererHelper(object):
                   'request':request,
                   'req':request,
                   }
-        try:
-            registry = request.registry
-            csrf = registry.queryUtility(ICSRF)
-            if csrf is not None:
-                system['csrf_token'] = csrf.get_csrf_token(request)
-        except AttributeError:
-            pass
         return self.render_to_response(response, system, request=request)
 
     def render(self, value, system_values, request=None):
@@ -456,7 +449,6 @@ class RendererHelper(object):
 
         registry = self.registry
         registry.notify(system_values)
-
         result = renderer(value, system_values)
         return result
 

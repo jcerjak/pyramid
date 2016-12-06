@@ -12,7 +12,6 @@ from pyramid.interfaces import (
 
 from pyramid.csrf import SessionCSRF
 
-from pyramid.config.util import as_sorted_tuple
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import action_method
 from pyramid.util import as_sorted_tuple
@@ -179,6 +178,10 @@ class SecurityConfiguratorMixin(object):
         """
         Set the default CSRF options used by subsequent view registrations.
 
+        ``implementation`` is a class that implements the
+        :meth:`pyramid.interfaces.ICSRF` interface that will be used for all
+        CSRF functionality. Default: :class:`pyramid.csrf.SessionCSRF`.
+
         ``require_csrf`` controls whether CSRF checks will be automatically
         enabled on each view in the application. This value is used as the
         fallback when ``require_csrf`` is left at the default of ``None`` on
@@ -224,8 +227,13 @@ class SecurityConfiguratorMixin(object):
         intr['header'] = header
         intr['safe_methods'] = as_sorted_tuple(safe_methods)
         intr['callback'] = callback
+
+        from pyramid.csrf import csrf_token_template_global
+        from pyramid.events import BeforeRender
+        self.add_subscriber(csrf_token_template_global, [BeforeRender])
         self.action(IDefaultCSRFOptions, register, order=PHASE1_CONFIG,
                     introspectables=(intr,))
+
 
 @implementer(IDefaultCSRFOptions)
 class DefaultCSRFOptions(object):
