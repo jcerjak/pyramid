@@ -290,3 +290,5 @@ Contributors
 - Mikko Ohtamaa, 2016/12/6
 
 - Martin Frlin, 2016/12/6
+
+- Jure Cerjak, 2016/12/7
