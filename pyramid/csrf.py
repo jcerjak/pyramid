@@ -24,6 +24,9 @@ class SessionCSRF(object):
     versions of Python. The ``new_csrf_token`` and ``get_csrf_token`` methods
     are indirected to the underlying session implementation.
 
+    Note that using this CSRF implementation requires that
+    a :term:`session factory` is configured.
+
     .. versionadded :: 1.8a1
     """
     def new_csrf_token(self, request):
@@ -78,24 +81,21 @@ def check_csrf_token(request,
                      token='csrf_token',
                      header='X-CSRF-Token',
                      raises=True):
-    """ Check the CSRF token in the request's session against the value in
-    ``request.POST.get(token)`` (if a POST request) or
-    ``request.headers.get(header)``. If a ``token`` keyword is not supplied to
-    this function, the string ``csrf_token`` will be used to look up the token
-    in ``request.POST``. If a ``header`` keyword is not supplied to this
-    function, the string ``X-CSRF-Token`` will be used to look up the token in
-    ``request.headers``.
+    """ Check the CSRF token returned by the :meth:`pyramid.interfaces.ICSRF`
+    implementation against the value in ``request.POST.get(token)`` (if a POST
+    request) or ``request.headers.get(header)``. If a ``token`` keyword is not
+    supplied to this function, the string ``csrf_token`` will be used to look
+    up the token in ``request.POST``. If a ``header`` keyword is not supplied
+    to this function, the string ``X-CSRF-Token`` will be used to look up the
+    token in ``request.headers``.
 
-    If the value supplied by post or by header doesn't match the value
-    supplied by ``request.session.get_csrf_token()``, and ``raises`` is
-    ``True``, this function will raise an
-    :exc:`pyramid.exceptions.BadCSRFToken` exception.
-    If the values differ and ``raises`` is ``False``, this function will
-    return ``False``.  If the CSRF check is successful, this function will
-    return ``True`` unconditionally.
-
-    Note that using this function requires that a :term:`session factory` is
-    configured.
+    If the value supplied by post or by header doesn't match the value supplied
+    by ``impl.get_csrf_token()`` (where ``impl`` is an implementation of
+    :meth:`pyramid.interfaces.ICSRF`), and ``raises`` is ``True``, this
+    function will raise an :exc:`pyramid.exceptions.BadCSRFToken` exception. If
+    the values differ and ``raises`` is ``False``, this function will return
+    ``False``.  If the CSRF check is successful, this function will return
+    ``True`` unconditionally.
 
     See :ref:`auto_csrf_checking` for information about how to secure your
     application automatically against CSRF attacks.
