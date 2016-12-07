@@ -869,7 +869,7 @@ Checking CSRF Tokens Manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In request handling code, you can check the presence and validity of a CSRF
-token with :func:`pyramid.session.check_csrf_token`. If the token is valid, it
+token with :func:`pyramid.csrf.check_csrf_token`. If the token is valid, it
 will return ``True``, otherwise it will raise ``HTTPBadRequest``. Optionally,
 you can specify ``raises=False`` to have the check return ``False`` instead of
 raising an exception.
@@ -879,7 +879,7 @@ named ``X-CSRF-Token``.
 
 .. code-block:: python
 
-   from pyramid.session import check_csrf_token
+   from pyramid.csrf import check_csrf_token
 
    def myview(request):
        # Require CSRF Token
@@ -958,4 +958,4 @@ include ``check_csrf=True`` as a view predicate. See
    A mismatch of a CSRF token is treated like any other predicate miss, and the
    predicate system, when it doesn't find a view, raises ``HTTPNotFound``
    instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
-   from calling :func:`pyramid.session.check_csrf_token`.
+   from calling :func:`pyramid.csrf.check_csrf_token`.
