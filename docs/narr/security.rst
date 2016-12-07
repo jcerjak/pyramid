@@ -777,11 +777,14 @@ If the URL is one that may modify or delete data, the consequences can be dire.
 
 You can avoid most of these attacks by issuing a unique token to the browser
 and then requiring that it be present in all potentially unsafe requests.
-:app:`Pyramid` sessions provide facilities to create and check CSRF tokens.
+:app:`Pyramid` provides facilities to create and check CSRF tokens.
 
-To use CSRF tokens, you must first enable a :term:`session factory` as
-described in :ref:`using_the_default_session_factory` or
-:ref:`using_alternate_session_factories`.
+By default :app:`Pyramid` comes with a session-based CSRF implementation.
+To use it, you must first enable a :term:`session factory` as described in
+:ref:`using_the_default_session_factory` or
+:ref:`using_alternate_session_factories`. Alternatively, you can register
+your own implementation of :class:`pyramid.interfaces.ICSRF` which does not
+use sessions.
 
 .. index::
    single: csrf.get_csrf_token
