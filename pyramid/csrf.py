@@ -108,8 +108,7 @@ def csrf_token_template_global(event):
         return
     else:
         csrf = registry.getUtility(ICSRFPolicy)
-        if csrf is not None:
-            event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
+        event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
 
 
 def get_csrf_token(request):
@@ -121,8 +120,7 @@ def get_csrf_token(request):
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFPolicy)
-    if csrf is not None:
-        return csrf.get_csrf_token(request)
+    return csrf.get_csrf_token(request)
 
 
 def new_csrf_token(request):
@@ -134,8 +132,7 @@ def new_csrf_token(request):
     """
     registry = request.registry
     csrf = registry.getUtility(ICSRFPolicy)
-    if csrf is not None:
-        return csrf.new_csrf_token(request)
+    return csrf.new_csrf_token(request)
 
 
 def check_csrf_token(request,
