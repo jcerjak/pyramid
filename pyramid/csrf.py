@@ -22,7 +22,7 @@ from pyramid.util import (
 @implementer(ICSRFPolicy)
 class SessionCSRF(object):
     """ The default CSRF implementation, which mimics the behavior from older
-    versions of Python. The ``new_csrf_token`` and ``get_csrf_token`` methods
+    versions of Pyramid. The ``new_csrf_token`` and ``get_csrf_token`` methods
     are indirected to the underlying session implementation.
 
     Note that using this CSRF implementation requires that
