@@ -783,8 +783,8 @@ By default :app:`Pyramid` comes with a session-based CSRF implementation.
 To use it, you must first enable a :term:`session factory` as described in
 :ref:`using_the_default_session_factory` or
 :ref:`using_alternate_session_factories`. Alternatively, you can register
-your own implementation of :class:`pyramid.interfaces.ICSRF` which does not
-use sessions.
+your own implementation of :class:`pyramid.interfaces.ICSRFPolicy` which does
+not use sessions.
 
 .. index::
    single: csrf.get_csrf_token
