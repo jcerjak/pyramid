@@ -170,7 +170,7 @@ class SecurityConfiguratorMixin(object):
     @action_method
     def set_default_csrf_options(
         self,
-        implementation=SessionCSRF,
+        implementation=None,
         require_csrf=True,
         token='csrf_token',
         header='X-CSRF-Token',
@@ -217,8 +217,10 @@ class SecurityConfiguratorMixin(object):
         options = DefaultCSRFOptions(
             require_csrf, token, header, safe_methods, callback,
         )
+        if implementation is None:
+            implementation = SessionCSRF()
         def register():
-            self.registry.registerUtility(implementation(), ICSRFPolicy)
+            self.registry.registerUtility(implementation, ICSRFPolicy)
             self.registry.registerUtility(options, IDefaultCSRFOptions)
         intr = self.introspectable('default csrf view options',
                                    None,
