@@ -146,7 +146,7 @@ For example, the following view declaration protects the view named
    # config is an instance of pyramid.config.Configurator
 
    config.add_view('mypackage.views.blog_entry_add_view',
-                   name='add_entry.html', 
+                   name='add_entry.html',
                    context='mypackage.resources.Blog',
                    permission='add')
 
@@ -725,7 +725,7 @@ object that implements the following interface:
             """ Return ``True`` if any of the ``principals`` is allowed the
             ``permission`` in the current ``context``, else return ``False``
             """
-            
+
         def principals_allowed_by_permission(self, context, permission):
             """ Return a set of principal identifiers allowed by the
             ``permission`` in ``context``.  This behavior is optional; if you

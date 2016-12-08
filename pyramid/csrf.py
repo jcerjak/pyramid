@@ -53,7 +53,8 @@ class CookieCSRF(object):
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
     OWASP CSRF guidelines. This gives some additional flexibility with regards
-    to scalingas the tokens can be generated and verified by a front-end server.
+    to scaling as the tokens can be generated and verified by a front-end
+    server.
 
     .. versionadded :: 1.8a1
     """
