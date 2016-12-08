@@ -214,6 +214,21 @@ class CookieCSRFTests(unittest.TestCase):
             }
         )
 
+    def test_verifying_token_against_existing_cookie(self):
+        config = Configurator()
+        config.set_default_csrf_options(implementation=self._makeOne())
+        config.commit()
+
+        response = MockResponse()
+        request = DummyRequest(config.registry, response=response)
+        request.cookies = {'csrf_token': 'e6f325fee5974f3da4315a8ccf4513d2'}
+
+        ICSRFPolicy = self._getICSRFPolicy()
+        policy = config.registry.getUtility(ICSRFPolicy)
+        self.assertTrue(
+            policy.check_csrf_token(request, 'e6f325fee5974f3da4315a8ccf4513d2')
+        )
+
 
 class DummyRequest(object):
     registry = None
