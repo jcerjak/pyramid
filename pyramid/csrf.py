@@ -149,7 +149,7 @@ def check_csrf_token(request,
     ``request.headers``.
 
     If the value supplied by post or by header doesn't match the value supplied
-    by ``impl.get_csrf_token()`` (where ``impl`` is an implementation of
+    by ``policy.get_csrf_token()`` (where ``policy`` is an implementation of
     :class:`pyramid.interfaces.ICSRFPolicy`), and ``raises`` is ``True``, this
     function will raise an :exc:`pyramid.exceptions.BadCSRFToken` exception. If
     the values differ and ``raises`` is ``False``, this function will return
