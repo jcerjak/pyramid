@@ -3,7 +3,7 @@ import unittest
 from pyramid.config import Configurator
 from pyramid.csrf import SessionCSRF, get_csrf_token, new_csrf_token
 from pyramid.events import BeforeRender
-from pyramid.interfaces import ICSRF
+from pyramid.interfaces import ICSRFPolicy
 from pyramid.tests.test_view import BaseTest as ViewBaseTest
 
 
@@ -63,11 +63,11 @@ class SessionCSRFTests(unittest.TestCase):
 
         request = DummyRequest(config.registry, self.MockSession())
         self.assertEqual(
-            config.registry.getUtility(ICSRF).get_csrf_token(request),
+            config.registry.getUtility(ICSRFPolicy).get_csrf_token(request),
             '02821185e4c94269bdc38e6eeae0a2f8'
         )
         self.assertEqual(
-            config.registry.getUtility(ICSRF).new_csrf_token(request),
+            config.registry.getUtility(ICSRFPolicy).new_csrf_token(request),
             'e5e9e30a08b34ff9842ff7d2b958c14b'
         )
 

@@ -3,22 +3,22 @@ from functools import partial
 from zope.interface import implementer
 
 from pyramid.compat import (
-    bytes_,
     urlparse,
-    )
+    bytes_
+)
 from pyramid.exceptions import (
     BadCSRFOrigin,
     BadCSRFToken,
 )
-from pyramid.interfaces import ICSRF
+from pyramid.interfaces import ICSRFPolicy
 from pyramid.settings import aslist
 from pyramid.util import (
     is_same_domain,
-    strings_differ,
+    strings_differ
 )
 
 
-@implementer(ICSRF)
+@implementer(ICSRFPolicy)
 class SessionCSRF(object):
     """ The default CSRF implementation, which mimics the behavior from older
     versions of Python. The ``new_csrf_token`` and ``get_csrf_token`` methods
@@ -38,6 +38,15 @@ class SessionCSRF(object):
         a new one if needed."""
         return request.session.get_csrf_token()
 
+    def check_csrf_token(self, request, supplied_token):
+        """ Returns True if supplied_token is the same value as get_csrf_token
+        returns for this request. """
+        expected = self.get_csrf_token(request)
+        return not strings_differ(
+            bytes_(expected, 'ascii'),
+            bytes_(supplied_token, 'ascii'),
+        )
+
 
 def csrf_token_template_global(event):
     request = event.get('request', None)
@@ -46,7 +55,7 @@ def csrf_token_template_global(event):
     except AttributeError:
         return
     else:
-        csrf = registry.getUtility(ICSRF)
+        csrf = registry.getUtility(ICSRFPolicy)
         if csrf is not None:
             event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
 
@@ -59,7 +68,7 @@ def get_csrf_token(request):
     .. versionadded :: 1.8a1
     """
     registry = request.registry
-    csrf = registry.getUtility(ICSRF)
+    csrf = registry.getUtility(ICSRFPolicy)
     if csrf is not None:
         return csrf.get_csrf_token(request)
 
@@ -72,7 +81,7 @@ def new_csrf_token(request):
     .. versionadded :: 1.8a1
     """
     registry = request.registry
-    csrf = registry.getUtility(ICSRF)
+    csrf = registry.getUtility(ICSRFPolicy)
     if csrf is not None:
         return csrf.new_csrf_token(request)
 
@@ -81,7 +90,7 @@ def check_csrf_token(request,
                      token='csrf_token',
                      header='X-CSRF-Token',
                      raises=True):
-    """ Check the CSRF token returned by the :meth:`pyramid.interfaces.ICSRF`
+    """ Check the CSRF token returned by the :meth:`pyramid.interfaces.ICSRFPolicy`
     implementation against the value in ``request.POST.get(token)`` (if a POST
     request) or ``request.headers.get(header)``. If a ``token`` keyword is not
     supplied to this function, the string ``csrf_token`` will be used to look
@@ -91,7 +100,7 @@ def check_csrf_token(request,
 
     If the value supplied by post or by header doesn't match the value supplied
     by ``impl.get_csrf_token()`` (where ``impl`` is an implementation of
-    :meth:`pyramid.interfaces.ICSRF`), and ``raises`` is ``True``, this
+    :meth:`pyramid.interfaces.ICSRFPolicy`), and ``raises`` is ``True``, this
     function will raise an :exc:`pyramid.exceptions.BadCSRFToken` exception. If
     the values differ and ``raises`` is ``False``, this function will return
     ``False``.  If the CSRF check is successful, this function will return
@@ -111,9 +120,9 @@ def check_csrf_token(request,
        Moved from pyramid.session to pyramid.csrf
     """
     supplied_token = ""
-    # If we were unable to locate a CSRF token in a request body, then we'll
-    # check to see if there are any headers that have a value for us.
-    if supplied_token == "" and header is not None:
+    # We first check the headers for a csrf token, as that is significantly
+    # cheaper than checking the POST body
+    if header is not None:
         supplied_token = request.headers.get(header, "")
 
     # If this is a POST/PUT/etc request, then we'll check the body to see if it
@@ -121,12 +130,11 @@ def check_csrf_token(request,
     # should never appear in an URL as doing so is a security issue. We also
     # explicitly check for request.POST here as we do not support sending form
     # encoded data over anything but a request.POST.
-    if token is not None:
+    if supplied_token == "" and token is not None:
         supplied_token = request.POST.get(token, "")
 
-    impl = request.registry.getUtility(ICSRF)
-    expected_token = impl.get_csrf_token(request)
-    if strings_differ(bytes_(expected_token), bytes_(supplied_token)):
+    policy = request.registry.getUtility(ICSRFPolicy)
+    if not policy.check_csrf_token(request, supplied_token):
         if raises:
             raise BadCSRFToken('check_csrf_token(): Invalid token')
         return False

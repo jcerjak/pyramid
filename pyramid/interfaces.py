@@ -993,7 +993,7 @@ class ISession(IDict):
         """
 
 
-class ICSRF(Interface):
+class ICSRFPolicy(Interface):
     """ An object that offers the ability to verify CSRF tokens and generate
     new ones"""
 
@@ -1007,6 +1007,12 @@ class ICSRF(Interface):
         ``new_csrf_token``, that token will be returned.  If no CSRF token
         was previously set, ``new_csrf_token`` will be called, which will 
         create and set a token, and this token will be returned.
+        """
+
+    def check_csrf_token(request, supplied_token):
+        """ Returns a boolean that represents if supplied_token is a valid CSRF
+        token for this request. Comparing strings for equality must be done
+        using :func:`pyramid.utils.strings_differ` to avoid timing attacks.
         """
 
 

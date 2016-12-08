@@ -3,7 +3,7 @@ from zope.interface import implementer
 from pyramid.interfaces import (
     IAuthorizationPolicy,
     IAuthenticationPolicy,
-    ICSRF,
+    ICSRFPolicy,
     IDefaultCSRFOptions,
     IDefaultPermission,
     PHASE1_CONFIG,
@@ -181,7 +181,7 @@ class SecurityConfiguratorMixin(object):
         Set the default CSRF options used by subsequent view registrations.
 
         ``implementation`` is a class that implements the
-        :meth:`pyramid.interfaces.ICSRF` interface that will be used for all
+        :meth:`pyramid.interfaces.ICSRFPolicy` interface that will be used for all
         CSRF functionality. Default: :class:`pyramid.csrf.SessionCSRF`.
 
         ``require_csrf`` controls whether CSRF checks will be automatically
@@ -218,7 +218,7 @@ class SecurityConfiguratorMixin(object):
             require_csrf, token, header, safe_methods, callback,
         )
         def register():
-            self.registry.registerUtility(implementation(), ICSRF)
+            self.registry.registerUtility(implementation(), ICSRFPolicy)
             self.registry.registerUtility(options, IDefaultCSRFOptions)
         intr = self.introspectable('default csrf view options',
                                    None,
