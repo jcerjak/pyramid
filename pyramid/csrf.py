@@ -46,7 +46,7 @@ def csrf_token_template_global(event):
     except AttributeError:
         return
     else:
-        csrf = registry.queryUtility(ICSRF)
+        csrf = registry.getUtility(ICSRF)
         if csrf is not None:
             event['get_csrf_token'] = partial(csrf.get_csrf_token, request)
 
@@ -59,7 +59,7 @@ def get_csrf_token(request):
     .. versionadded :: 1.8a1
     """
     registry = request.registry
-    csrf = registry.queryUtility(ICSRF)
+    csrf = registry.getUtility(ICSRF)
     if csrf is not None:
         return csrf.get_csrf_token(request)
 
@@ -72,7 +72,7 @@ def new_csrf_token(request):
     .. versionadded :: 1.8a1
     """
     registry = request.registry
-    csrf = registry.queryUtility(ICSRF)
+    csrf = registry.getUtility(ICSRF)
     if csrf is not None:
         return csrf.new_csrf_token(request)
 
@@ -111,6 +111,11 @@ def check_csrf_token(request,
        Moved from pyramid.session to pyramid.csrf
     """
     supplied_token = ""
+    # If we were unable to locate a CSRF token in a request body, then we'll
+    # check to see if there are any headers that have a value for us.
+    if supplied_token == "" and header is not None:
+        supplied_token = request.headers.get(header, "")
+
     # If this is a POST/PUT/etc request, then we'll check the body to see if it
     # has a token. We explicitly use request.POST here because CSRF tokens
     # should never appear in an URL as doing so is a security issue. We also
@@ -118,11 +123,6 @@ def check_csrf_token(request,
     # encoded data over anything but a request.POST.
     if token is not None:
         supplied_token = request.POST.get(token, "")
-
-    # If we were unable to locate a CSRF token in a request body, then we'll
-    # check to see if there are any headers that have a value for us.
-    if supplied_token == "" and header is not None:
-        supplied_token = request.headers.get(header, "")
 
     impl = request.registry.getUtility(ICSRF)
     expected_token = impl.get_csrf_token(request)
