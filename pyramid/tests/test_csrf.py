@@ -8,13 +8,6 @@ from pyramid.events import BeforeRender
 
 
 class Test_get_csrf_token(unittest.TestCase):
-    class DummyCSRF(object):
-        def new_csrf_token(self, request):
-            return 'e5e9e30a08b34ff9842ff7d2b958c14b'
-
-        def get_csrf_token(self, request):
-            return '02821185e4c94269bdc38e6eeae0a2f8'
-
     def setUp(self):
         self.config = testing.setUp()
 
@@ -29,7 +22,7 @@ class Test_get_csrf_token(unittest.TestCase):
             self._callFUT(request)
 
     def test_success(self):
-        self.config.set_default_csrf_options(implementation=self.DummyCSRF())
+        self.config.set_default_csrf_options(implementation=DummyCSRF())
         request = testing.DummyRequest()
 
         csrf_token = self._callFUT(request)
@@ -38,13 +31,6 @@ class Test_get_csrf_token(unittest.TestCase):
 
 
 class Test_new_csrf_token(unittest.TestCase):
-    class DummyCSRF(object):
-        def new_csrf_token(self, request):
-            return 'e5e9e30a08b34ff9842ff7d2b958c14b'
-
-        def get_csrf_token(self, request):
-            return '02821185e4c94269bdc38e6eeae0a2f8'
-
     def setUp(self):
         self.config = testing.setUp()
 
@@ -59,7 +45,7 @@ class Test_new_csrf_token(unittest.TestCase):
             self._callFUT(request)
 
     def test_success(self):
-        self.config.set_default_csrf_options(implementation=self.DummyCSRF())
+        self.config.set_default_csrf_options(implementation=DummyCSRF())
         request = testing.DummyRequest()
 
         csrf_token = self._callFUT(request)
@@ -68,13 +54,6 @@ class Test_new_csrf_token(unittest.TestCase):
 
 
 class Test_csrf_token_template_global(unittest.TestCase):
-    class DummyCSRF(object):
-        def new_csrf_token(self, request):
-            return 'e5e9e30a08b34ff9842ff7d2b958c14b'
-
-        def get_csrf_token(self, request):
-            return '02821185e4c94269bdc38e6eeae0a2f8'
-
     def setUp(self):
         self.config = testing.setUp()
 
@@ -108,7 +87,7 @@ class Test_csrf_token_template_global(unittest.TestCase):
 
     def test_csrf_token_passed_to_template(self):
         config = Configurator()
-        config.set_default_csrf_options(implementation=self.DummyCSRF())
+        config.set_default_csrf_options(implementation=DummyCSRF())
         config.commit()
 
         request = testing.DummyRequest()
@@ -259,3 +238,11 @@ class MockResponse(object):
         self.called_args = args
         self.called_kwargs = kwargs
         return
+
+
+class DummyCSRF(object):
+    def new_csrf_token(self, request):
+        return 'e5e9e30a08b34ff9842ff7d2b958c14b'
+
+    def get_csrf_token(self, request):
+        return '02821185e4c94269bdc38e6eeae0a2f8'
