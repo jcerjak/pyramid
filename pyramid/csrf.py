@@ -1,4 +1,5 @@
 from functools import partial
+import uuid
 
 from zope.interface import implementer
 
@@ -37,6 +38,57 @@ class SessionCSRF(object):
         """ Returns the currently active CSRF token from the session, generating
         a new one if needed."""
         return request.session.get_csrf_token()
+
+    def check_csrf_token(self, request, supplied_token):
+        """ Returns True if supplied_token is the same value as get_csrf_token
+        returns for this request. """
+        expected = self.get_csrf_token(request)
+        return not strings_differ(
+            bytes_(expected, 'ascii'),
+            bytes_(supplied_token, 'ascii'),
+        )
+
+@implementer(ICSRFPolicy)
+class CookieCSRF(object):
+    """ An alternative CSRF implementation that stores its information in
+    unauthenticated cookies, known as the 'Double Submit Cookie' method in the
+    OWASP CSRF guidelines. This gives some additional flexibility with regards
+    to scalingas the tokens can be generated and verified by a front-end server.
+    
+    .. versionadded :: 1.8a1
+    """
+    
+    def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
+                 domain=None, path='/'):
+        self.cookie_name = cookie_name
+        self.secure = secure
+        self.httponly = httponly
+        self.domain = domain
+        self.path = path
+
+    def new_csrf_token(self, request):
+        """ Sets a new CSRF token into the request and returns it. """
+        token = uuid.uuid4().hex
+        def set_cookie(request, response):
+            response.set_cookie(
+                self.cookie_name,
+                token,
+                httponly=self.httponly,
+                secure=self.secure,
+                domain=self.domain,
+                path=self.path,
+                overwrite=True,
+            )
+        request.add_response_callback(set_cookie)
+        return token
+
+    def get_csrf_token(self, request):
+        """ Returns the currently active CSRF token by checking the cookies
+        sent with the current request."""
+        token = request.cookies.get(self.cookie_name)
+        if not token:
+            token = self.new_csrf_token(request)
+        return token
 
     def check_csrf_token(self, request, supplied_token):
         """ Returns True if supplied_token is the same value as get_csrf_token
